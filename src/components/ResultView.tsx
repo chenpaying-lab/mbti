@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { mbtiTypes } from '../data/mbtiTypes';
 import { DimensionChart } from './DimensionChart';
 import { RefreshCw, Share2, Download, Brain } from 'lucide-react';
@@ -24,6 +24,8 @@ interface ResultViewProps {
 export const ResultView: React.FC<ResultViewProps> = ({ type, scores, onRestart }) => {
   const personality = mbtiTypes[type];
 
+  const [showToast, setShowToast] = React.useState(false);
+
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -33,7 +35,8 @@ export const ResultView: React.FC<ResultViewProps> = ({ type, scores, onRestart 
       }).catch(console.error);
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     }
   };
 
@@ -41,8 +44,21 @@ export const ResultView: React.FC<ResultViewProps> = ({ type, scores, onRestart 
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="w-full max-w-3xl mx-auto space-y-8"
+      className="w-full max-w-3xl mx-auto space-y-8 relative"
     >
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] text-white px-8 py-4 rounded-2xl font-black cartoon-border shadow-2xl"
+          >
+            Link copied to clipboard! ✨
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="cartoon-card relative overflow-hidden rotate-1">
         <div className="relative z-10 text-center space-y-6 mb-16">
           <div className="inline-block bg-[#FFD93D] px-6 py-2 rounded-full cartoon-border -rotate-3 animate-bounce">
@@ -94,7 +110,7 @@ export const ResultView: React.FC<ResultViewProps> = ({ type, scores, onRestart 
             Retake Test
           </button>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => window.location.href = '/'}
             className="flex items-center justify-center gap-3 px-10 py-5 bg-[#FFD93D] text-gray-900 rounded-3xl font-black text-2xl cartoon-button rotate-1"
           >
             <Brain size={28} />

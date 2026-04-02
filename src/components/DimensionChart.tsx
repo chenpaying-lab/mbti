@@ -1,5 +1,4 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, LabelList } from 'recharts';
 
 interface DimensionChartProps {
   scores: {
